@@ -45,8 +45,7 @@ func main() {
 		panic(err)
 	}
 	bot.Debug = true
-	fmt.Printf("%+v\n\n%T\n\n%v\n\n\n", bot, bot, prettyPrint(bot))
-
+	
 	updateConfig := tgbot.NewUpdate(0)
 	updateConfig.Timeout = 60
 	updates := bot.GetUpdatesChan(updateConfig)
@@ -57,7 +56,7 @@ func main() {
 			msg := tgbot.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			switch update.Message.Text {
 			case "open":
-				msg.ReplyMarkup = numericInlineKeyboard
+				msg.ReplyMarkup = numericKeyboard
 			case "close":
 				msg.ReplyMarkup = tgbot.NewRemoveKeyboard(true)
 			}
