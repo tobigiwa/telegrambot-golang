@@ -11,23 +11,17 @@ import (
 
 func main() {
 	BotToken, ok := os.LookupEnv("BOT_TOKEN3")
-	fmt.Println(BotToken)
 	if !ok || BotToken == "" {
 		log.Fatal("No Token")
 	}
 
-	fmt.Println(BotToken)
 	bot := telegrambot.NewBot(BotToken)
-	bot.Debug = true
+	// bot.Debug = true
 	updateConfig := tgbotapi.NewUpdate(0)
 	updateConfig.Timeout = 60
 	updates := bot.GetUpdatesChan(updateConfig)
 
 	for update := range updates {
-
-		if update.Message == nil { // if no message is sent
-			continue
-		}
 
 		chatID := update.Message.Chat.ID
 		NewMsg := tgbotapi.NewMessage(chatID, "...")
@@ -57,16 +51,22 @@ func main() {
 					goto send
 				}
 			}
-		} else if update.CallbackQuery != nil {
+		}
+
+		if update.CallbackQuery != nil {
 			fmt.Print("\n\n\n\n\n\n\n\n\n")
 			a := update.CallbackQuery.Data
 			fmt.Println(a)
-			switch a {
-			case "todaysMotivation":
-				telegrambot.SetParseModeToMarkdownV2(&NewMsg).Text = "*goooood*"
-				goto send
+			//switch a {
+			//case "todaysMotivation":
+			//	callback := tgbotapi.NewCallback(update.CallbackQuery.ID, a)
+			//	if _, err := bot.Request(callback); err != nil {
+			//		panic(err)
+			//	}
+			//	NewMsg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Data)
+			//	goto send
 
-			}
+			//}
 		}
 
 	send:
