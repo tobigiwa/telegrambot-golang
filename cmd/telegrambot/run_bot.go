@@ -25,37 +25,53 @@ func main() {
 
 	for update := range updates {
 
-		if update.Message != nil {
-			chatID := update.Message.Chat.ID
-			textMessage := update.Message.Text
-			msg := tgbotapi.NewMessage(chatID, textMessage)
+		if update.Message == nil { // if no message is sent
+			continue
+		}
 
-			if update.Message.IsCommand() {
-				switch update.Message.Command() {
-				case "start":
-					telegrambot.SetParseModeToMarkdownV2(&msg).Text = "😬 *Go \n _AWAY_*"
+		chatID := update.Message.Chat.ID
+		NewMsg := tgbotapi.NewMessage(chatID, "...")
+
+		if update.Message != nil {
+			textMessage := update.Message.Text // handles all `text` messages
+			if textMessage != "" {
+				switch textMessage {
+				case "Our Motivations 🧘‍♀️":
+					NewMsg.ReplyMarkup = telegrambot.FromBaseKeyboardInlineKeyboard
+					NewMsg.ReplyToMessageID = update.Message.MessageID
 					goto send
+
 				default:
-					msg.Text = "COMMAND WAY"
+					NewMsg.ReplyMarkup = telegrambot.NumericKeyboard
 					goto send
 				}
 			}
 
-			switch textMessage {
-			case "start":
-				msg.ReplyToMessageID = update.Message.MessageID
-				goto send
-
-			default:
-				msg.ReplyMarkup = telegrambot.NumericKeyboard
-				goto send
+			if update.Message.IsCommand() {
+				switch update.Message.Command() {
+				case "start":
+					telegrambot.SetParseModeToMarkdownV2(&NewMsg).Text = "😬 *Go \n _AWAY_*"
+					goto send
+				default:
+					NewMsg.Text = "COMMAND WAY"
+					goto send
+				}
 			}
+		} else if update.CallbackQuery != nil {
+			fmt.Print("\n\n\n\n\n\n\n\n\n")
+			a := update.CallbackQuery.Data
+			fmt.Println(a)
+			switch a {
+			case "todaysMotivation":
+				telegrambot.SetParseModeToMarkdownV2(&NewMsg).Text = "*goooood*"
+				goto send
 
-		send:
-			if _, err := bot.Send(msg); err != nil {
-				log.Panic(err)
 			}
 		}
 
+	send:
+		if _, err := bot.Send(NewMsg); err != nil {
+			log.Panic(err)
+		}
 	}
 }

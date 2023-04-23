@@ -4,15 +4,14 @@ import (
 	tgbot "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-var NumericInlineKeyboard = tgbot.NewInlineKeyboardMarkup(
+var FromBaseKeyboardInlineKeyboard = tgbot.NewInlineKeyboardMarkup(
 	tgbot.NewInlineKeyboardRow(
-		tgbot.NewInlineKeyboardButtonURL("1.com", "http://1.com"),
-		tgbot.NewInlineKeyboardButtonData("_222_", "222"),
-		tgbot.NewInlineKeyboardButtonData("*333*", "333"),
+		tgbot.NewInlineKeyboardButtonData("Show today's motivation", "todaysMotivation"),
 	),
 	tgbot.NewInlineKeyboardRow(
-		tgbot.NewInlineKeyboardButtonData("4", "4"),
-		tgbot.NewInlineKeyboardButtonData("5", "5"),
-		tgbot.NewInlineKeyboardButtonData("6", "6"),
+		tgbot.NewInlineKeyboardButtonData("Random motivation", "randomMotivation"),
+	),
+	tgbot.NewInlineKeyboardRow(
+		tgbot.NewInlineKeyboardButtonData("Motivation on...", "motivationOn"),
 	),
 )

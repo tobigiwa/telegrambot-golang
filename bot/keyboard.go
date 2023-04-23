@@ -4,29 +4,32 @@ import (
 	tgbot "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-var NumericKeyboard = NewReplyKeyboard(
+var NumericKeyboard = customNewReplyKeyboard(customReplyKeyboardMarkup{ResizeKeyboard: false, InputFieldPlaceholder: "What would you lke to do now..."},
 	tgbot.NewKeyboardButtonRow(
-		tgbot.NewKeyboardButton("🧘‍♀️"),
+		tgbot.NewKeyboardButton("Our Motivations 🧘‍♀️"),
+		tgbot.NewKeyboardButton("Remainder system 🕰"),
 	),
 	tgbot.NewKeyboardButtonRow(
-		tgbot.NewKeyboardButton("⚕"),
+		tgbot.NewKeyboardButton("Therapy 💆💚"),
 	),
-
-// tgbot.NewKeyboardButtonRow(
-//
-//	tgbot.NewKeyboardButton("🕰"),
-//
-// ),
 )
 
-func NewReplyKeyboard(rows ...[]tgbot.KeyboardButton) tgbot.ReplyKeyboardMarkup {
+type customReplyKeyboardMarkup struct {
+	ResizeKeyboard        bool
+	OneTimeKeyboard       bool
+	Selective             bool
+	InputFieldPlaceholder string
+}
+
+func customNewReplyKeyboard(configs customReplyKeyboardMarkup, rows ...[]tgbot.KeyboardButton) tgbot.ReplyKeyboardMarkup {
 	var keyboard [][]tgbot.KeyboardButton
 
 	keyboard = append(keyboard, rows...)
 
 	return tgbot.ReplyKeyboardMarkup{
-		ResizeKeyboard:        false,
+		ResizeKeyboard:        configs.ResizeKeyboard,
 		Keyboard:              keyboard,
-		InputFieldPlaceholder: "hfhdd",
+		InputFieldPlaceholder: configs.InputFieldPlaceholder,
+		Selective:             configs.Selective,
 	}
 }
