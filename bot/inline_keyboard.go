@@ -6,7 +6,8 @@ import (
 
 var FromBaseKeyboardInlineKeyboard = tgbot.NewInlineKeyboardMarkup(
 	tgbot.NewInlineKeyboardRow(
-		tgbot.NewInlineKeyboardButtonData("Show today's motivation", "todaysMotivation"),
+		tgbot.NewInlineKeyboardButtonURL("1.com", "http://1.com"),
+		tgbot.NewInlineKeyboardButtonData("Show today's motivation", TextKeyboardOne),
 	),
 	tgbot.NewInlineKeyboardRow(
 		tgbot.NewInlineKeyboardButtonData("Random motivation", "randomMotivation"),

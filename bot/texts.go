@@ -1,5 +1,5 @@
 package bot
 
-var textKeyboardOne string = `*Our _Motivation*_`
+var TextKeyboardOne string = "todaysMotivation"
 
 

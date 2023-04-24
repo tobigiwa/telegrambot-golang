@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -9,69 +8,69 @@ import (
 	telegrambot "github.com/tobigiwa/telegrambot-golang/bot"
 )
 
-func main() {
-	BotToken, ok := os.LookupEnv("BOT_TOKEN3")
-	if !ok || BotToken == "" {
-		log.Fatal("No Token")
-	}
+var bot = telegrambot.NewBot(getToken())
 
-	bot := telegrambot.NewBot(BotToken)
-	// bot.Debug = true
+func main() {
+
 	updateConfig := tgbotapi.NewUpdate(0)
 	updateConfig.Timeout = 60
 	updates := bot.GetUpdatesChan(updateConfig)
 
+	log.Printf("Authorized on account %s", bot.Self.UserName)
+
 	for update := range updates {
 
 		chatID := update.Message.Chat.ID
-		NewMsg := tgbotapi.NewMessage(chatID, "...")
+		NewMsg := tgbotapi.NewMessage(chatID, update.Message.Text)
+		if update.Message.IsCommand() {
 
-		if update.Message != nil {
-			textMessage := update.Message.Text // handles all `text` messages
-			if textMessage != "" {
-				switch textMessage {
-				case "Our Motivations 🧘‍♀️":
-					NewMsg.ReplyMarkup = telegrambot.FromBaseKeyboardInlineKeyboard
-					NewMsg.ReplyToMessageID = update.Message.MessageID
-					goto send
-
-				default:
-					NewMsg.ReplyMarkup = telegrambot.NumericKeyboard
-					goto send
-				}
+			switch update.Message.Command() {
+			case "start":
+				telegrambot.SetParseModeToMarkdownV2(&NewMsg).Text = "😬 *Go \n _AWAY_*"
+				SendNewMessage(NewMsg)
+			default:
+				NewMsg.Text = "COMMAND WAY"
+				SendNewMessage(NewMsg)
 			}
+		}
 
-			if update.Message.IsCommand() {
-				switch update.Message.Command() {
-				case "start":
-					telegrambot.SetParseModeToMarkdownV2(&NewMsg).Text = "😬 *Go \n _AWAY_*"
-					goto send
-				default:
-					NewMsg.Text = "COMMAND WAY"
-					goto send
-				}
+		if update.Message != nil && update.Message.Text != "" {
+
+			switch update.Message.Text {
+			case "Our Motivations 🧘‍♀️":
+				NewMsg.ReplyMarkup = telegrambot.FromBaseKeyboardInlineKeyboard
+				NewMsg.ReplyToMessageID = update.Message.MessageID
+				SendNewMessage(NewMsg)
+			default:
+				NewMsg.ReplyMarkup = telegrambot.NumericKeyboard
+				SendNewMessage(NewMsg)
 			}
 		}
 
 		if update.CallbackQuery != nil {
-			fmt.Print("\n\n\n\n\n\n\n\n\n")
-			a := update.CallbackQuery.Data
-			fmt.Println(a)
-			//switch a {
-			//case "todaysMotivation":
-			//	callback := tgbotapi.NewCallback(update.CallbackQuery.ID, a)
-			//	if _, err := bot.Request(callback); err != nil {
-			//		panic(err)
-			//	}
-			//	NewMsg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Data)
-			//	goto send
 
-			//}
+			callback := tgbotapi.NewCallback(update.CallbackQuery.ID,
+				update.CallbackQuery.Data)
+			if _, err := bot.Request(callback); err != nil {
+				panic(err)
+			}
+			NewMsg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Data)
+			SendNewMessage(NewMsg)
 		}
 
-	send:
-		if _, err := bot.Send(NewMsg); err != nil {
-			log.Panic(err)
-		}
 	}
+}
+
+func SendNewMessage(msg tgbotapi.Chattable) {
+	if _, err := bot.Send(msg); err != nil {
+		log.Panic(err)
+	}
+}
+
+func getToken() string {
+	BotToken, ok := os.LookupEnv("BOT_TOKEN2")
+	if !ok || BotToken == "" {
+		log.Fatal("No Token")
+	}
+	return BotToken
 }
