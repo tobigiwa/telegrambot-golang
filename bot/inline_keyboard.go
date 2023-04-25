@@ -1,18 +1,22 @@
 package bot
 
 import (
-	tgbot "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	tele "gopkg.in/telebot.v3"
 )
 
-var FromBaseKeyboardInlineKeyboard = tgbot.NewInlineKeyboardMarkup(
-	tgbot.NewInlineKeyboardRow(
-		tgbot.NewInlineKeyboardButtonURL("1.com", "http://1.com"),
-		tgbot.NewInlineKeyboardButtonData("Show today's motivation", TextKeyboardOne),
-	),
-	tgbot.NewInlineKeyboardRow(
-		tgbot.NewInlineKeyboardButtonData("Random motivation", "randomMotivation"),
-	),
-	tgbot.NewInlineKeyboardRow(
-		tgbot.NewInlineKeyboardButtonData("Motivation on...", "motivationOn"),
-	),
+var (
+	motivationInlineKeyboard = &tele.ReplyMarkup{ResizeKeyboard: true}
+
+	GetTodaysQouteInlineKeyboardBtn = motivationInlineKeyboard.Data("See todays Quote", "seeQuote", "seeQuote")
+	QoutesOnInlineKeyboardBtn       = motivationInlineKeyboard.Data("Get quote on love, peace, money", "QuoteOn", "QuoteOn")
+	RandomQuotesKeyboardBtn         = motivationInlineKeyboard.Data("See any quote", "anyQuote", "anyQuote")
 )
+
+func MotivationInlineKeyboard() *tele.ReplyMarkup {
+	motivationInlineKeyboard.Inline(
+		motivationInlineKeyboard.Row(GetTodaysQouteInlineKeyboardBtn),
+		motivationInlineKeyboard.Row(QoutesOnInlineKeyboardBtn),
+		motivationInlineKeyboard.Row(RandomQuotesKeyboardBtn),
+	)
+	return motivationInlineKeyboard
+}
