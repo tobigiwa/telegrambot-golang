@@ -29,7 +29,7 @@ func main() {
 
 	bot.Handle(&build.MotivationKeyboardBtn, build.MotivationFunc)
 
-	bot.Handle(&build.GetTodaysQouteInlineKeyboardBtn, )
+	bot.Handle(&build.GetTodaysQouteInlineKeyboardBtn, build.GetTodaysQuote)
 
 	bot.Handle(tele.OnText, func(c tele.Context) error {
 		return c.Send(`<b><i>What would you like to do...</i></b>`, build.StartKeyboard(), tele.ModeHTML)
