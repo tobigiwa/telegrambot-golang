@@ -5,18 +5,22 @@ import (
 )
 
 var (
-	motivationInlineKeyboard = &tele.ReplyMarkup{ResizeKeyboard: true}
+	motivationInlineKeyboard = &tele.ReplyMarkup{
+		ResizeKeyboard:  true,
+		OneTimeKeyboard: true,
+		ForceReply:      true,
+		Placeholder:     "click on any of the buttons...",
+	}
 
-	GetTodaysQouteInlineKeyboardBtn = motivationInlineKeyboard.Data("See todays Quote", "seeQuote", "seeQuote")
-	QoutesOnInlineKeyboardBtn       = motivationInlineKeyboard.Data("Get quote on love, peace, money", "QuoteOn", "QuoteOn")
-	RandomQuotesKeyboardBtn         = motivationInlineKeyboard.Data("See any quote", "anyQuote", "anyQuote")
+	GetTodaysQouteInlineKeyboardBtn = motivationInlineKeyboard.Data("Todays Quote", "seeQuote", "seeQuote")
+	RandomQuotesKeyboardBtn         = motivationInlineKeyboard.Data("Any quote", "anyQuote", "anyQuote")
+	ImageQoutesOnInlineKeyboardBtn  = motivationInlineKeyboard.Data("Motivational Image", "QuoteOn", "image")
 )
 
 func MotivationInlineKeyboard() *tele.ReplyMarkup {
 	motivationInlineKeyboard.Inline(
-		motivationInlineKeyboard.Row(GetTodaysQouteInlineKeyboardBtn),
-		motivationInlineKeyboard.Row(QoutesOnInlineKeyboardBtn),
-		motivationInlineKeyboard.Row(RandomQuotesKeyboardBtn),
+		motivationInlineKeyboard.Row(GetTodaysQouteInlineKeyboardBtn, RandomQuotesKeyboardBtn),
+		motivationInlineKeyboard.Row(ImageQoutesOnInlineKeyboardBtn),
 	)
 	return motivationInlineKeyboard
 }

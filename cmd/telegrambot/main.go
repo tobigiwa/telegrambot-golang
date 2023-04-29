@@ -10,7 +10,7 @@ import (
 )
 
 func getToken() string {
-	BotToken, ok := os.LookupEnv("BOT_TOKEN3")
+	BotToken, ok := os.LookupEnv("BOT_TOKEN1")
 	if !ok || BotToken == "" {
 		log.Fatal("No Token")
 	}
@@ -18,22 +18,32 @@ func getToken() string {
 }
 
 func main() {
+
 	pref := tele.Settings{
 		Token:  getToken(),
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
-		// Verbose:   true,
 	}
 
 	bot := build.NewBot(pref)
-	log.Printf("Authorized on account %s", bot.Me.Username)
+	log.Printf("Authorized on account... %s", bot.Me.Username)
 
+	// keyboards
 	bot.Handle(&build.MotivationKeyboardBtn, build.MotivationFunc)
+	bot.Handle(&build.ReligionKeyboardBtn, build.ReligionKeyboardHandlerFunc)
+	bot.Handle(&build.BibleTextReligionMessageKeyboardBtn, build.GetBibleTextHandlerFunc)
+	bot.Handle(&build.AudioReligionMessageKeyboardBtn, build.GetAudioMessageHandlerFunc)
+	bot.Handle(&build.AudioAndTextReligionMessageKeyboardBtn, build.GetBothAudioAndTextReligionMessageHandlerFunc)
 
-	bot.Handle(&build.GetTodaysQouteInlineKeyboardBtn, build.GetTodaysQuote)
+	// inline keyboards
+	bot.Handle(&build.GetTodaysQouteInlineKeyboardBtn, build.GetTodaysQuoteFunc)
+	bot.Handle(&build.RandomQuotesKeyboardBtn, build.GetRandomQuoteFunc)
+	bot.Handle(&build.ImageQoutesOnInlineKeyboardBtn, build.GetRandomQuoteImageFunc)
 
-	bot.Handle(tele.OnText, func(c tele.Context) error {
-		return c.Send(`<b><i>What would you like to do...</i></b>`, build.StartKeyboard(), tele.ModeHTML)
-	})
+	// any text
+	bot.Handle(tele.OnText, build.StartHandlerFunc, build.CheckMemberShip)
+
+	build.InitializeAllCronTask(bot)
 
 	bot.Start()
+
 }
