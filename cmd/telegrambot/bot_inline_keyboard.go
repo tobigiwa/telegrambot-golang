@@ -1,4 +1,4 @@
-package bot
+package main
 
 import (
 	tele "gopkg.in/telebot.v3"
@@ -13,13 +13,13 @@ var (
 	}
 
 	GetTodaysQouteInlineKeyboardBtn = motivationInlineKeyboard.Data("Todays Quote", "seeQuote", "seeQuote")
-	RandomQuotesKeyboardBtn         = motivationInlineKeyboard.Data("Any quote", "anyQuote", "anyQuote")
+	RandomQuotesInlineKeyboardBtn   = motivationInlineKeyboard.Data("Any quote", "anyQuote", "anyQuote")
 	ImageQoutesOnInlineKeyboardBtn  = motivationInlineKeyboard.Data("Motivational Image", "QuoteOn", "image")
 )
 
 func MotivationInlineKeyboard() *tele.ReplyMarkup {
 	motivationInlineKeyboard.Inline(
-		motivationInlineKeyboard.Row(GetTodaysQouteInlineKeyboardBtn, RandomQuotesKeyboardBtn),
+		motivationInlineKeyboard.Row(GetTodaysQouteInlineKeyboardBtn, RandomQuotesInlineKeyboardBtn),
 		motivationInlineKeyboard.Row(ImageQoutesOnInlineKeyboardBtn),
 	)
 	return motivationInlineKeyboard

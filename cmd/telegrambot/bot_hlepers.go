@@ -1,14 +1,25 @@
-package bot
+package main
 
 import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	tele "gopkg.in/telebot.v3"
 )
 
-func NewBot(pref tele.Settings) *tele.Bot {
+type FuncOrSlice interface {
+	func() []string | []string
+}
+
+func NewBot(token string, timeout int) *tele.Bot {
+
+	pref := tele.Settings{
+		Token:  token,
+		Poller: &tele.LongPoller{Timeout: time.Duration(timeout) * time.Second},
+	}
+
 	b, err := tele.NewBot(pref)
 	if err != nil {
 		log.Fatal(err)

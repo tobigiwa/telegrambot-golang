@@ -1,49 +1,95 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"log"
 	"os"
-	"time"
 
-	build "github.com/tobigiwa/telegrambot-golang/bot"
+	_ "github.com/mattn/go-sqlite3"
+
+	"github.com/tobigiwa/telegrambot-golang/internal/store"
+	"github.com/tobigiwa/telegrambot-golang/logging"
+
 	tele "gopkg.in/telebot.v3"
 )
 
-func getToken() string {
-	BotToken, ok := os.LookupEnv("BOT_TOKEN1")
-	if !ok || BotToken == "" {
-		log.Fatal("No Token")
-	}
-	return BotToken
+type Database interface {
+	// IsUser returns true if user is found in the db and false otherwise.
+	IsUser(int64) bool
+	Delete(int64) error
+	Insert(int64, string) error
+	All() ([]store.USER, error)
+}
+
+type Logger interface {
+	LogInfo(string, string)
+	LogError(error, string)
+	LogFatal(error, string)
+	WriteToStandarOutput(string)
+}
+
+// Application is the monolothic struct for the application
+type Application struct {
+	// Bot holds the Bot instance
+	Bot *tele.Bot
+	// Storage holds the database instance
+	Storage Database
+	//Logger holds the logger instance
+	Logger Logger
 }
 
 func main() {
+	// DATABSE
+	conn, err := sql.Open("sqlite3", "db.sqlite3")
+	if err != nil {
+		log.Fatal(err)
+	}
+	db := store.NewSQLiteRespository(conn)
 
-	pref := tele.Settings{
-		Token:  getToken(),
-		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
+	// LOGGER
+	logger, err := logging.NewLogger()
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	bot := build.NewBot(pref)
-	log.Printf("Authorized on account... %s", bot.Me.Username)
+	// BOT
+	bot := NewBot(getToken(), 10)
+
+	app := Application{
+		Bot:     bot,
+		Storage: db,
+		Logger:  logger,
+	}
+	app.Logger.WriteToStandarOutput(fmt.Sprintf("Authorized on account... %s", app.Bot.Me.Username))
 
 	// keyboards
-	bot.Handle(&build.MotivationKeyboardBtn, build.MotivationFunc)
-	bot.Handle(&build.ReligionKeyboardBtn, build.ReligionKeyboardHandlerFunc)
-	bot.Handle(&build.BibleTextReligionMessageKeyboardBtn, build.GetBibleTextHandlerFunc)
-	bot.Handle(&build.AudioReligionMessageKeyboardBtn, build.GetAudioMessageHandlerFunc)
-	bot.Handle(&build.AudioAndTextReligionMessageKeyboardBtn, build.GetBothAudioAndTextReligionMessageHandlerFunc)
+	app.Bot.Handle(&MotivationKeyboardBtn, app.MotivationFunc)
+	app.Bot.Handle(&ReligionKeyboardBtn, app.ReligionKeyboardHandlerFunc)
+	app.Bot.Handle(&BibleTextReligionMessageKeyboardBtn, app.GetBibleTextHandlerFunc)
+	app.Bot.Handle(&AudioReligionMessageKeyboardBtn, app.GetAudioMessageHandlerFunc)
+	app.Bot.Handle(&AudioAndTextReligionMessageKeyboardBtn, app.GetBothAudioAndTextReligionMessageHandlerFunc)
 
 	// inline keyboards
-	bot.Handle(&build.GetTodaysQouteInlineKeyboardBtn, build.GetTodaysQuoteFunc)
-	bot.Handle(&build.RandomQuotesKeyboardBtn, build.GetRandomQuoteFunc)
-	bot.Handle(&build.ImageQoutesOnInlineKeyboardBtn, build.GetRandomQuoteImageFunc)
+	app.Bot.Handle(&GetTodaysQouteInlineKeyboardBtn, app.GetTodaysQuoteFunc)
+	app.Bot.Handle(&RandomQuotesInlineKeyboardBtn, app.GetRandomQuoteFunc)
+	app.Bot.Handle(&ImageQoutesOnInlineKeyboardBtn, app.GetRandomQuoteImageFunc)
 
 	// any text
-	bot.Handle(tele.OnText, build.StartHandlerFunc, build.CheckMemberShip)
+	app.Bot.Handle(tele.OnText, app.StartHandlerFunc, app.CheckMemberShip)
 
-	build.InitializeAllCronTask(bot)
+	// cron jobs
+	InitializeAllCronTask(app.Bot)
 
-	bot.Start()
+	// polling
+	app.Bot.Start()
 
+}
+
+func getToken() (token string) {
+	token, ok := os.LookupEnv("BOT_TOKEN1")
+	if !ok || token == "" {
+		log.Fatal("No Token")
+	}
+	return token
 }

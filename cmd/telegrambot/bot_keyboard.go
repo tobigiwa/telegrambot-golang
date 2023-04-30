@@ -1,4 +1,4 @@
-package bot
+package main
 
 import (
 	tele "gopkg.in/telebot.v3"
