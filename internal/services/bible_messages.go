@@ -18,7 +18,7 @@ func resolveAudioMessageDate() string {
 	return fmt.Sprintf("%02d%v", month, day)
 }
 
-func GetAudioMessage() []string {
+func GetAudioMessage() error {
 	var partAuidoURL string = "https://www.heartlight.org/audio/votd/2"
 
 	monthAndDay := resolveAudioMessageDate()
@@ -26,34 +26,34 @@ func GetAudioMessage() []string {
 
 	res, err := http.Get(fullAudioURL)
 	if err != nil {
-		return failedResponse
+		return err
 	}
 	defer res.Body.Close()
 	file, err := os.Create("assets/" + AudioFilename)
 	if err != nil {
-		return failedResponse
+		return err
 	}
 	_, err = io.Copy(file, res.Body)
 	if err != nil {
-		return failedResponse
+		return err
 	}
 	return nil
 }
 
-func ScrapeBibleText() []string {
+func ScrapeBibleText() ([]string, error) {
 	resp, err := http.Get("https://www.verseoftheday.com/#featured")
 	if err != nil {
-		return failedResponse
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
-		return failedResponse
+		return nil, err
 	}
 
 	message := strings.Split(doc.Find("#featured .scripture .bilingual-left").Text(), "—")[0]
 	verse := doc.Find("#featured .scripture .bilingual-left a").Text()
 
-	return []string{message, verse}
+	return []string{message, verse}, nil
 }

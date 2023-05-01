@@ -1,3 +1,6 @@
 .env
 non.go
 .idea
+*.sqlite3
+*.log
+assets/

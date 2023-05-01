@@ -5,39 +5,17 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
+	"github.com/go-co-op/gocron"
 	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/tobigiwa/telegrambot-golang/internal/store"
 	"github.com/tobigiwa/telegrambot-golang/logging"
 
+	botBuild "github.com/tobigiwa/telegrambot-golang/bot"
 	tele "gopkg.in/telebot.v3"
 )
-
-type Database interface {
-	// IsUser returns true if user is found in the db and false otherwise.
-	IsUser(int64) bool
-	Delete(int64) error
-	Insert(int64, string) error
-	All() ([]store.USER, error)
-}
-
-type Logger interface {
-	LogInfo(string, string)
-	LogError(error, string)
-	LogFatal(error, string)
-	WriteToStandarOutput(string)
-}
-
-// Application is the monolothic struct for the application
-type Application struct {
-	// Bot holds the Bot instance
-	Bot *tele.Bot
-	// Storage holds the database instance
-	Storage Database
-	//Logger holds the logger instance
-	Logger Logger
-}
 
 func main() {
 	// DATABSE
@@ -45,7 +23,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer conn.Close()
 	db := store.NewSQLiteRespository(conn)
+	err = db.Migrate()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// LOGGER
 	logger, err := logging.NewLogger()
@@ -54,32 +37,59 @@ func main() {
 	}
 
 	// BOT
-	bot := NewBot(getToken(), 10)
+	bot := botBuild.NewBot(getToken(), 10)
 
-	app := Application{
+	app := botBuild.Application{
 		Bot:     bot,
 		Storage: db,
 		Logger:  logger,
 	}
+
+	// Other setups
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	dir := cwd + "/assets"
+	// if _, err := os.Stat(dir); errors.Is(err, os.ErrNotExist) {
+	// 	err := os.Mkdir(dir, 0755)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// }
+	err = os.MkdirAll(dir, 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	app.Logger.WriteToStandarOutput(cwd)
 	app.Logger.WriteToStandarOutput(fmt.Sprintf("Authorized on account... %s", app.Bot.Me.Username))
 
 	// keyboards
-	app.Bot.Handle(&MotivationKeyboardBtn, app.MotivationFunc)
-	app.Bot.Handle(&ReligionKeyboardBtn, app.ReligionKeyboardHandlerFunc)
-	app.Bot.Handle(&BibleTextReligionMessageKeyboardBtn, app.GetBibleTextHandlerFunc)
-	app.Bot.Handle(&AudioReligionMessageKeyboardBtn, app.GetAudioMessageHandlerFunc)
-	app.Bot.Handle(&AudioAndTextReligionMessageKeyboardBtn, app.GetBothAudioAndTextReligionMessageHandlerFunc)
+	app.Bot.Handle(&botBuild.MotivationKeyboardBtn, app.MotivationKeyboardHandlerFunc)
+	app.Bot.Handle(&botBuild.TherapyKeyboardBtn, app.TherapyKeyboardHandleFunc)
+	app.Bot.Handle(&botBuild.RemindernKeyboardBtn, app.RemainderyKeyboardHandleFunc)
+	app.Bot.Handle(&botBuild.ReligionKeyboardBtn, app.ReligionKeyboardHandlerFunc)
+	app.Bot.Handle(&botBuild.BibleTextReligionMessageKeyboardBtn, app.GetBibleTextHandlerFunc)
+	app.Bot.Handle(&botBuild.AudioReligionMessageKeyboardBtn, app.GetAudioMessageHandlerFunc)
+	app.Bot.Handle(&botBuild.AudioAndTextReligionMessageKeyboardBtn, app.GetBothAudioAndTextReligionMessageHandlerFunc)
+	app.Bot.Handle(&botBuild.BackToStartKeyboardBtn, app.BackToStartHanlerFunc)
 
 	// inline keyboards
-	app.Bot.Handle(&GetTodaysQouteInlineKeyboardBtn, app.GetTodaysQuoteFunc)
-	app.Bot.Handle(&RandomQuotesInlineKeyboardBtn, app.GetRandomQuoteFunc)
-	app.Bot.Handle(&ImageQoutesOnInlineKeyboardBtn, app.GetRandomQuoteImageFunc)
+	app.Bot.Handle(&botBuild.GetTodaysQouteInlineKeyboardBtn, app.GetTodaysQuoteFunc)
+	app.Bot.Handle(&botBuild.RandomQuotesInlineKeyboardBtn, app.GetRandomQuoteFunc)
+	app.Bot.Handle(&botBuild.ImageQoutesOnInlineKeyboardBtn, app.GetRandomQuoteImageFunc)
 
 	// any text
 	app.Bot.Handle(tele.OnText, app.StartHandlerFunc, app.CheckMemberShip)
 
 	// cron jobs
-	InitializeAllCronTask(app.Bot)
+	s := gocron.NewScheduler(time.UTC)
+
+	s.Every(1).Day().At("6:30").Do(app.CronTodaysQuote, app.Bot)
+
+	s.StartAsync()
 
 	// polling
 	app.Bot.Start()

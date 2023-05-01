@@ -8,10 +8,9 @@ import (
 )
 
 var (
-	todaysQuote      string   = "https://zenquotes.io/api/today"
-	randomQuote      string   = "https://zenquotes.io/api/random"
-	randomQuoteImage string   = "https://zenquotes.io/api/image"
-	failedResponse   []string = []string{"unable to fetch request", "please do try again"}
+	todaysQuote      string = "https://zenquotes.io/api/today"
+	randomQuote      string = "https://zenquotes.io/api/random"
+	randomQuoteImage string = "https://zenquotes.io/api/image"
 )
 
 func get(url string) ([]QuotesAndAuthors, error) {
@@ -28,38 +27,38 @@ func get(url string) ([]QuotesAndAuthors, error) {
 	return a, nil
 }
 
-func processQuote(list []QuotesAndAuthors) []string {
-	return []string{list[0].Quote, list[0].Author}
+func processQuote(list []QuotesAndAuthors) ([]string, error) {
+	return []string{list[0].Quote, list[0].Author}, nil
 
 }
-func GetTodaysQuote() []string {
+func GetTodaysQuote() ([]string, error) {
 	a, err := get(todaysQuote)
 	if err != nil {
-		return failedResponse
+		return nil, err
 	}
 	return processQuote(a)
 }
 
-func GetRandomQuote() []string {
+func GetRandomQuote() ([]string, error) {
 	a, err := get(randomQuote)
 	if err != nil {
-		return failedResponse
+		return nil, err
 	}
 	return processQuote(a)
 }
 
-func GetRandomsQuoteImage() []string {
+func GetRandomsQuoteImage() error {
 	resp, err := http.Get(randomQuoteImage)
 	if err != nil {
-		return failedResponse
+		return err
 	}
 	file, err := os.Create("assets/image.jpeg")
 	if err != nil {
-		return failedResponse
+		return err
 	}
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {
-		return failedResponse
+		return err
 	}
 	return nil
 }

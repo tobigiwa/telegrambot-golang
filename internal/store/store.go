@@ -16,6 +16,17 @@ type SQLiteRespository struct {
 	db *sql.DB
 }
 
+func init() {
+
+}
+
+func (DB *SQLiteRespository) Migrate() error {
+	query := `CREATE TABLE IF NOT EXISTS users_tbl(id INTEGER PRIMARY KEY, username TEXT NOT NULL UNIQUE);`
+
+	_, err := DB.db.Exec(query)
+	return err
+}
+
 func NewSQLiteRespository(db *sql.DB) *SQLiteRespository {
 	return &SQLiteRespository{
 		db: db,
@@ -38,26 +49,27 @@ func (DB *SQLiteRespository) Insert(userID int64, userUsername string) error {
 	return nil
 }
 
-func (DB *SQLiteRespository) All() ([]USER, error) {
-	query := `select * from users_tbl`
+// AllIDs returns a slice of all user id and an error
+func (DB *SQLiteRespository) AllIDs() ([]int64, error) {
+	query := `select id from users_tbl`
 	rows, err := DB.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var UserList []USER
+	var userIDs []int64
 	for rows.Next() {
-		var user USER
-		if err := rows.Scan(&user.ID, &user.Username); err != nil {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return nil, ErrNoRows
 			} else {
 				return nil, err
 			}
 		}
-		UserList = append(UserList, user)
+		userIDs = append(userIDs, id)
 	}
-	return UserList, nil
+	return userIDs, nil
 }
 
 // IsUser returns true if user is found in the db and false otherwise.
