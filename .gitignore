@@ -4,3 +4,4 @@ non.go
 *.sqlite3
 *.log
 assets/
+cmd/telegrambot/telegrambot
