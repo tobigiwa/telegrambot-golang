@@ -19,6 +19,10 @@ import (
 
 func main() {
 	// DATABSE
+	_, err := os.Create("db.sqlite3")
+	if err != nil {
+		log.Fatal(err)
+	}
 	conn, err := sql.Open("sqlite3", "db.sqlite3")
 	if err != nil {
 		log.Fatal(err)
@@ -51,12 +55,7 @@ func main() {
 		log.Fatal(err)
 	}
 	dir := cwd + "/assets"
-	// if _, err := os.Stat(dir); errors.Is(err, os.ErrNotExist) {
-	// 	err := os.Mkdir(dir, 0755)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// }
+
 	err = os.MkdirAll(dir, 0755)
 	if err != nil {
 		log.Fatal(err)

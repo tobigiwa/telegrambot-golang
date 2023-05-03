@@ -21,7 +21,7 @@ func init() {
 }
 
 func (DB *SQLiteRespository) Migrate() error {
-	query := `CREATE TABLE IF NOT EXISTS users_tbl(id INTEGER PRIMARY KEY, username TEXT NOT NULL UNIQUE);`
+	query := `CREATE TABLE IF NOT EXISTS users_tbl(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT);`
 
 	_, err := DB.db.Exec(query)
 	return err
@@ -39,7 +39,7 @@ func (DB *SQLiteRespository) Insert(userID int64, userUsername string) error {
 	if err != nil {
 		var sqliteErr sqlite3.Error
 		if errors.As(err, &sqliteErr) {
-			if errors.Is(sqliteErr.ExtendedCode, sqlite3.ErrConstraintUnique) {
+			if errors.Is(err, sqlite3.ErrConstraintUnique) {
 				return ErrDuplicate
 			} else {
 				return err

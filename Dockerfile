@@ -2,7 +2,7 @@ FROM golang:1.20-alpine
 
 RUN mkdir /app
 
-# WORKDIR /app
+WORKDIR /app
 
 COPY . /app
 
@@ -10,9 +10,9 @@ RUN go mod tidy
 
 RUN source .env
 
-WORKDIR /app/cmd/telegrmbot
+WORKDIR /app/cmd/telegrambot
 
-RUN go build -o telegrambot 
+RUN go build 
 
-CMD [ "/telegrambot" ]
+CMD [ "./telegrambot" ]
 

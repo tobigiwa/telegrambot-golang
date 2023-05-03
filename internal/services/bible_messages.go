@@ -15,7 +15,7 @@ var AudioFilename string = fmt.Sprintf("audio_%v.mp3", resolveAudioMessageDate()
 
 func resolveAudioMessageDate() string {
 	_, month, day := time.Now().Date()
-	return fmt.Sprintf("%02d%v", month, day)
+	return fmt.Sprintf("%02d%02d", month, day)
 }
 
 func GetAudioMessage() error {
