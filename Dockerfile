@@ -1,18 +1,17 @@
-FROM golang:1.20-alpine
-
-RUN mkdir /app
+FROM golang:1.20 AS builder
 
 WORKDIR /app
 
 COPY . /app
 
-RUN go mod tidy
+RUN go mod download
 
-RUN source .env
+RUN CGO_ENABLED=1 GOOS=linux go build -o telegrambot -a -ldflags '-linkmode external -extldflags "-static"' .
 
-WORKDIR /app/cmd/telegrambot
+FROM alpine 
 
-RUN go build 
+WORKDIR /root/
 
-CMD [ "./telegrambot" ]
+COPY --from=builder /app/telegrambot /app/.env /root/
 
+CMD ./telegrambot
