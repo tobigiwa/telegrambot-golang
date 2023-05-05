@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron"
-	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/tobigiwa/telegrambot-golang/internal/store"
@@ -97,11 +96,6 @@ func main() {
 }
 
 func getToken() (token string) {
-
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 
 	token, ok := os.LookupEnv("BOT_TOKEN1")
 	if !ok || token == "" {
