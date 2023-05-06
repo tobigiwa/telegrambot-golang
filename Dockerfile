@@ -12,6 +12,6 @@ FROM alpine
 
 WORKDIR /root/
 
-COPY --from=builder /app/telegrambot /app/.env /root/
+COPY --from=builder /app/telegrambot /root/
 
 CMD ./telegrambot
