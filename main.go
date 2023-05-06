@@ -19,10 +19,6 @@ import (
 
 func main() {
 	// DATABSE
-	_, err := os.Create("db.sqlite3")
-	if err != nil {
-		log.Fatal(err)
-	}
 	conn, err := sql.Open("sqlite3", "db.sqlite3")
 	if err != nil {
 		log.Fatal(err)
