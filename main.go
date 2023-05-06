@@ -101,7 +101,7 @@ func getToken() (token string) {
 
 	token, ok := os.LookupEnv("BOT_TOKEN1")
 	if !ok || token == "" {
-		log.Fatal("Nog Token")
+		log.Fatal("No Token")
 	}
 	return token
 }
