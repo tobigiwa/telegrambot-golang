@@ -83,7 +83,8 @@ func main() {
 	// cron jobs
 	s := gocron.NewScheduler(time.UTC)
 
-	s.Every(1).Day().At("6:30").Do(app.CronTodaysQuote, app.Bot)
+	s.Every(1).Day().At("7:30").Do(app.CronTodaysQuote, app.Bot)
+	s.Every(1).Day().At("6:30").Do(app.CronTodaysReligiousMessage, app.Bot)
 
 	s.StartAsync()
 

@@ -6,8 +6,11 @@ import (
 	"os"
 	"time"
 
+	"github.com/tobigiwa/telegrambot-golang/internal/services"
 	tele "gopkg.in/telebot.v3"
 )
+
+var FailedRequest string = fmt.Sprintf("<b>%v</b>\n\n<i>%v</i>", "unable to fetch request", "please do try again")
 
 type FuncOrSlice interface {
 	func() []string | []string
@@ -29,10 +32,10 @@ func NewBot(token string, timeout int) *tele.Bot {
 
 func TextResponse(v []string, err error) (string, error) {
 	if err != nil {
-		return fmt.Sprintf("<b>%v</b>\n\n<i>%v</i>", "unable to fetch request", "please do try again"), err
+		return FailedRequest, err
 	}
 	if v == nil {
-		return fmt.Sprintf("<b>%v</b>\n\n<i>%v</i>", "unable to fetch request", "please do try again"), nil
+		return FailedRequest, nil
 	}
 	return fmt.Sprintf("<b>%v</b>\n\n<i>%v</i>", v[0], v[1]), nil
 
@@ -48,3 +51,26 @@ func checkIfFilePresent(filename string) bool {
 	return false
 
 }
+
+func resolveAudioMessgae() (*tele.Audio, error) {
+	_, m, d := time.Now().Date()
+	filename := fmt.Sprintf("Bible Reading for %v/%v", m, d)
+
+	if checkIfFilePresent(services.AudioFilename) {
+		a := &tele.Audio{File: tele.FromDisk("assets/" + services.AudioFilename), Title: filename, Performer: filename}
+		return a, nil
+	}
+
+	err := services.GetAudioMessage()
+	if err != nil {
+		return nil, err
+	}
+	au := &tele.Audio{File: tele.FromDisk("assets/" + services.AudioFilename), Title: filename, Performer: filename}
+	return au, nil
+
+}
+
+// msg, err := TextResponse(nil, services.GetAudioMessage())
+// if err != nil {
+// 	return msg, nil
+// }

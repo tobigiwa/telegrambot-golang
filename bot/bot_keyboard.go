@@ -11,18 +11,18 @@ var (
 		// ForceReply:      true,
 	}
 
-	MotivationKeyboardBtn = startKeyboard.Text("Our Motivations 🧘‍♀️🧘‍♂️")
-	ReligionKeyboardBtn   = startKeyboard.Text("Lord's Message ✝️️🛐")
-	TherapyKeyboardBtn    = startKeyboard.Text("Meet the Therapist 💆🏾‍♀️💗")
-	RemindernKeyboardBtn  = startKeyboard.Text("Reminder 🕰")
-	GameKeyboardBtn       = startKeyboard.Text("Games 🎮	🧩")
+	MotivationKeyboardBtn = startKeyboard.Text("Our Motivations \n 🧘‍♀️ 🧘‍♂️")
+	ReligionKeyboardBtn   = startKeyboard.Text("Lord's Message \n ✝️️ 🛐")
+	TherapyKeyboardBtn    = startKeyboard.Text("Meet the Therapist \n 💆🏾‍♀️ 💗")
+	RemindernKeyboardBtn  = startKeyboard.Text("Reminder \n 🕰")
+	GameKeyboardBtn       = startKeyboard.Text("Games \n 🎮 🧩")
 )
 
 func StartKeyboard() *tele.ReplyMarkup {
 	startKeyboard.Reply(
 		startKeyboard.Row(MotivationKeyboardBtn, ReligionKeyboardBtn),
 		startKeyboard.Row(TherapyKeyboardBtn),
-		startKeyboard.Row(RemindernKeyboardBtn, GameKeyboardBtn),
+		startKeyboard.Row(GameKeyboardBtn, RemindernKeyboardBtn),
 	)
 	return startKeyboard
 }

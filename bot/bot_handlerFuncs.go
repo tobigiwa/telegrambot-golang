@@ -1,9 +1,6 @@
 package bot
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/tobigiwa/telegrambot-golang/internal/services"
 
 	tele "gopkg.in/telebot.v3"
@@ -74,23 +71,11 @@ func (a Application) GetBibleTextHandlerFunc(c tele.Context) error {
 }
 
 func (a Application) GetAudioMessageHandlerFunc(c tele.Context) error {
-
-	_, m, d := time.Now().Date()
-	filename := fmt.Sprintf("Bible Reading for %v/%v", m, d)
-
-	if checkIfFilePresent(services.AudioFilename) {
-		a := &tele.Audio{File: tele.FromDisk("assets/" + services.AudioFilename), Title: filename, Performer: filename}
-		return c.Reply(a)
-	}
-
-	msg, err := TextResponse(nil, services.GetAudioMessage())
+	audioFile, err := resolveAudioMessgae()
 	if err != nil {
-		a.Logger.LogError(err, "SERVICES")
-		return c.Reply(msg, tele.ModeHTML)
+		return c.Reply(FailedRequest, tele.ModeHTML)
 	}
-
-	au := &tele.Audio{File: tele.FromDisk("assets/" + services.AudioFilename), Title: filename, Performer: filename}
-	return c.Reply(au)
+	return c.Reply(audioFile)
 }
 
 func (a Application) GetBothAudioAndTextReligionMessageHandlerFunc(c tele.Context) error {
