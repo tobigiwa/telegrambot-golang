@@ -25,6 +25,10 @@ func (a Application) RemainderyKeyboardHandleFunc(c tele.Context) error {
 	return c.Reply("***Not implemented***", tele.ModeMarkdown)
 }
 
+func (a Application) GameKeyboardHandleFunc(c tele.Context) error {
+	return c.Reply("***Not implemented***", tele.ModeMarkdown)
+}
+
 func (a Application) GetTodaysQuoteFunc(c tele.Context) error {
 	msg, err := TextResponse(services.GetTodaysQuote())
 	if err != nil {

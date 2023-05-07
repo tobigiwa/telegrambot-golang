@@ -15,13 +15,14 @@ var (
 	ReligionKeyboardBtn   = startKeyboard.Text("Lord's Message ✝️️🛐")
 	TherapyKeyboardBtn    = startKeyboard.Text("Meet the Therapist 💆🏾‍♀️💗")
 	RemindernKeyboardBtn  = startKeyboard.Text("Reminder 🕰")
+	GameKeyboardBtn       = startKeyboard.Text("Games 🎮	🧩")
 )
 
 func StartKeyboard() *tele.ReplyMarkup {
 	startKeyboard.Reply(
 		startKeyboard.Row(MotivationKeyboardBtn, ReligionKeyboardBtn),
 		startKeyboard.Row(TherapyKeyboardBtn),
-		startKeyboard.Row(RemindernKeyboardBtn),
+		startKeyboard.Row(RemindernKeyboardBtn, GameKeyboardBtn),
 	)
 	return startKeyboard
 }
