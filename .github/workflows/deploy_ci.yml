@@ -26,4 +26,4 @@ jobs:
         run: curl -sL https://raw.githubusercontent.com/railwayapp/cli/master/install.sh | sh
 
       - name: Deploy to Railway
-        run: railway deploy --project 45383c9d-1964-4869-a084-05c435388dc9 --environment production --token ${{ secrets.RAILWAY_TELEGRAM_BOT_GOLANG_TOKEN }}
+        run: railway up --project 45383c9d-1964-4869-a084-05c435388dc9 --environment production --token ${{ secrets.RAILWAY_TELEGRAM_BOT_GOLANG_TOKEN }}
