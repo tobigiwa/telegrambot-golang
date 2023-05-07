@@ -1,0 +1,4 @@
+# railway.yml
+plugins:
+  - name: web
+    image: tobitobias/telegrambot-golang:latest
