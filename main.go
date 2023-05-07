@@ -65,6 +65,7 @@ func main() {
 	app.Bot.Handle(&botBuild.MotivationKeyboardBtn, app.MotivationKeyboardHandlerFunc)
 	app.Bot.Handle(&botBuild.TherapyKeyboardBtn, app.TherapyKeyboardHandleFunc)
 	app.Bot.Handle(&botBuild.RemindernKeyboardBtn, app.RemainderyKeyboardHandleFunc)
+	app.Bot.Handle(&botBuild.GameKeyboardBtn, app.GameKeyboardHandleFunc)
 	app.Bot.Handle(&botBuild.ReligionKeyboardBtn, app.ReligionKeyboardHandlerFunc)
 	app.Bot.Handle(&botBuild.BibleTextReligionMessageKeyboardBtn, app.GetBibleTextHandlerFunc)
 	app.Bot.Handle(&botBuild.AudioReligionMessageKeyboardBtn, app.GetAudioMessageHandlerFunc)
