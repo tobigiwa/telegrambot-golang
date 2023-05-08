@@ -11,8 +11,8 @@ var (
 		// ForceReply:      true,
 	}
 
-	MotivationKeyboardBtn = startKeyboard.Text("Our Motivations \n 🧘‍♀️ 🧘‍♂️")
-	ReligionKeyboardBtn   = startKeyboard.Text("Lord's Message \n ✝️️ 🛐")
+	MotivationKeyboardBtn = startKeyboard.Text("Motivations \n 🧘‍♀️ 🧘‍♂️")
+	ReligionKeyboardBtn   = startKeyboard.Text("Abba Father \n ✝️️ 🛐")
 	TherapyKeyboardBtn    = startKeyboard.Text("Meet the Therapist \n 💆🏾‍♀️ 💗")
 	RemindernKeyboardBtn  = startKeyboard.Text("Reminder \n 🕰")
 	GameKeyboardBtn       = startKeyboard.Text("Games \n 🎮 🧩")

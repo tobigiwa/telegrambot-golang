@@ -1,7 +1,7 @@
 name: Build and Deploy to Railway
 on:
   workflow_run:
-    workflows: ["Build"]
+    workflows: ["Build and Pusblish to DockerHub"]
     types:
       - completed
   push:
@@ -9,7 +9,7 @@ on:
       - master
 env:
   RAILWAY_TOKEN: ${{ secrets.RAILWAY_TELEGRAM_BOT_GOLANG_TOKEN }}
-  RAILWAY_PROJECT: 45383c9d-1964-4869-a084-05c435388dc9
+  RAILWAY_PROJECT: ${{ secrets.RAILWAY_TELEGRAM_BOT_GOLANG_PROJECT_ID }}
   RAILWAY_ENVIRONMENT: production
 jobs:
   deploy:
