@@ -13,7 +13,7 @@ func getScheduledText(work func() ([]string, error)) string {
 	return msg
 }
 
-func (a Application) CronTodaysQuote(bot *tele.Bot) {
+func (a Application) ScheduleTask(bot *tele.Bot, task func() ([]string, error)) {
 	users, err := a.Storage.AllIDs()
 	if err != nil {
 		a.Logger.LogError(err, "DB")
@@ -25,7 +25,7 @@ func (a Application) CronTodaysQuote(bot *tele.Bot) {
 	for _, user := range users {
 		go func(bot *tele.Bot, recepient int64) {
 			defer wg.Done()
-			bot.Send(&tele.User{ID: recepient}, getScheduledText(services.GetTodaysQuote), tele.ModeHTML)
+			bot.Send(&tele.User{ID: recepient}, getScheduledText(task), tele.ModeHTML)
 		}(bot, user)
 	}
 	wg.Wait()

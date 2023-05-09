@@ -6,8 +6,8 @@ import (
 
 var (
 	startKeyboard = &tele.ReplyMarkup{ResizeKeyboard: false,
-		OneTimeKeyboard: true,
-		Placeholder:     `What would you like to do...`,
+		// OneTimeKeyboard: true,
+		Placeholder: `What would you like to do...`,
 		// ForceReply:      true,
 	}
 
