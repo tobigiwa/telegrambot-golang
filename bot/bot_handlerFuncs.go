@@ -8,7 +8,6 @@ import (
 
 func (a Application) StartHandlerFunc(c tele.Context) error {
 	return c.Send(`<b><i>What would you like to do...</i></b>`, StartKeyboard(), tele.ModeHTML)
-
 }
 
 func (a Application) MotivationKeyboardHandlerFunc(c tele.Context) error {
@@ -39,7 +38,6 @@ func (a Application) GetRandomQuoteFunc(c tele.Context) error {
 	if err != nil {
 		a.Logger.LogError(err, "SERVICES")
 	}
-
 	return c.Send(msg, tele.ModeHTML)
 }
 
@@ -49,7 +47,6 @@ func (a Application) GetRandomQuoteImageFunc(c tele.Context) error {
 		a.Logger.LogError(err, "SERVICES")
 		return c.Send(msg, tele.ModeHTML)
 	}
-
 	p := &tele.Photo{File: tele.FromDisk("assets/image.jpeg")}
 	return c.Send(p)
 }

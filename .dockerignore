@@ -1,0 +1,7 @@
+.idea/*
+assets/*
+*.md
+*.logs
+.env
+.gitignore
+.dockerignore

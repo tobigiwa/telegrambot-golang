@@ -1,15 +1,16 @@
 package main
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
 	"github.com/go-co-op/gocron"
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/jackc/pgx/v5/pgxpool"
 
+	"github.com/tobigiwa/telegrambot-golang/internal/services"
 	"github.com/tobigiwa/telegrambot-golang/internal/store"
 	"github.com/tobigiwa/telegrambot-golang/logging"
 
@@ -19,12 +20,12 @@ import (
 
 func main() {
 	// DATABSE
-	conn, err := sql.Open("sqlite3", "db.sqlite3")
+	conn, err := pgxpool.New(context.Background(), getDatabaseURL())
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer conn.Close()
-	db := store.NewSQLiteRespository(conn)
+	db := store.NewRespository(conn)
 	err = db.Migrate()
 	if err != nil {
 		log.Fatal(err)
@@ -37,7 +38,7 @@ func main() {
 	}
 
 	// BOT
-	bot := botBuild.NewBot(getToken(), 10)
+	bot := botBuild.NewBot(getBotToken(), 10)
 
 	app := botBuild.Application{
 		Bot:     bot,
@@ -51,7 +52,6 @@ func main() {
 		log.Fatal(err)
 	}
 	dir := cwd + "/assets"
-
 	err = os.MkdirAll(dir, 0755)
 	if err != nil {
 		log.Fatal(err)
@@ -81,10 +81,13 @@ func main() {
 	app.Bot.Handle(tele.OnText, app.StartHandlerFunc, app.CheckMemberShip)
 
 	// cron jobs
-	s := gocron.NewScheduler(time.UTC)
+	now := time.Now().UTC()
+	lagos_time := now.In(time.FixedZone("WAT", 3600))
+	s := gocron.NewScheduler(lagos_time.Location())
 
-	s.Every(1).Day().At("7:30").Do(app.CronTodaysQuote, app.Bot)
 	s.Every(1).Day().At("6:30").Do(app.CronTodaysReligiousMessage, app.Bot)
+	s.Every(1).Day().At("7:30").Do(app.ScheduleTask, app.Bot, services.GetTodaysQuote)
+	s.Every(1).Day().At("20:00").Do(app.ScheduleTask, app.Bot, services.GetRandomQuote)
 
 	s.StartAsync()
 
@@ -93,11 +96,18 @@ func main() {
 
 }
 
-func getToken() (token string) {
-
+func getBotToken() (token string) {
 	token, ok := os.LookupEnv("BOT_TOKEN")
 	if !ok || token == "" {
 		log.Fatal("No Token")
 	}
 	return token
+}
+
+func getDatabaseURL() (databaseURL string) {
+	databaseURL, ok := os.LookupEnv("DATABASE_URL")
+	if !ok || databaseURL == "" {
+		log.Fatal("No databaseURL")
+	}
+	return databaseURL
 }
