@@ -9,6 +9,7 @@ var (
 		ResizeKeyboard:  true,
 		OneTimeKeyboard: true,
 		ForceReply:      true,
+		RemoveKeyboard:  true,
 		Placeholder:     "click on any of the buttons...",
 	}
 

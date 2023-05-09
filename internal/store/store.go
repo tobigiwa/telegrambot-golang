@@ -1,10 +1,12 @@
 package store
 
 import (
-	"database/sql"
+	"context"
 	"errors"
+	"strings"
 
-	"github.com/mattn/go-sqlite3"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type USER struct {
@@ -12,35 +14,35 @@ type USER struct {
 	Username string
 }
 
-type SQLiteRespository struct {
-	db *sql.DB
+type Respository struct {
+	db *pgxpool.Pool
 }
 
-func init() {
-
-}
-
-func (DB *SQLiteRespository) Migrate() error {
-	query := `CREATE TABLE IF NOT EXISTS users_tbl(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT);`
-
-	_, err := DB.db.Exec(query)
+func (DB *Respository) Migrate() error {
+	query := `CREATE TABLE IF NOT EXISTS users_tbl(id INTEGER PRIMARY KEY, username TEXT);`
+	_, err := DB.db.Exec(context.Background(), query)
 	return err
 }
 
-func NewSQLiteRespository(db *sql.DB) *SQLiteRespository {
-	return &SQLiteRespository{
+func NewRespository(db *pgxpool.Pool) *Respository {
+	return &Respository{
 		db: db,
 	}
 }
 
-func (DB *SQLiteRespository) Insert(userID int64, userUsername string) error {
-	query := `insert into users_tbl values(?, ?)`
-	_, err := DB.db.Exec(query, userID, userUsername)
+func (DB *Respository) Insert(userID int64, userUsername string) error {
+	query := `insert into users_tbl values($1, $2)`
+	_, err := DB.db.Exec(context.Background(), query, userID, userUsername)
 	if err != nil {
-		var sqliteErr sqlite3.Error
-		if errors.As(err, &sqliteErr) {
-			if errors.Is(err, sqlite3.ErrConstraintUnique) {
-				return ErrDuplicate
+		var pgxError *pgconn.PgError
+		if errors.As(err, &pgxError) {
+			if pgxError.Code == "23505" {
+				switch {
+				case strings.Contains(pgxError.Detail, "id"):
+					return ErrDuplicateID
+				case strings.Contains(pgxError.Detail, "username"):
+					return ErrDuplicateUsername
+				}
 			} else {
 				return err
 			}
@@ -50,9 +52,9 @@ func (DB *SQLiteRespository) Insert(userID int64, userUsername string) error {
 }
 
 // AllIDs returns a slice of all user id and an error
-func (DB *SQLiteRespository) AllIDs() ([]int64, error) {
+func (DB *Respository) AllIDs() ([]int64, error) {
 	query := `select id from users_tbl`
-	rows, err := DB.db.Query(query)
+	rows, err := DB.db.Query(context.Background(), query)
 	if err != nil {
 		return nil, err
 	}
@@ -60,22 +62,22 @@ func (DB *SQLiteRespository) AllIDs() ([]int64, error) {
 	var userIDs []int64
 	for rows.Next() {
 		var id int64
-		if err := rows.Scan(&id); err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return nil, ErrNoRows
-			} else {
-				return nil, err
-			}
+		err := rows.Scan(&id)
+		if err != nil {
+			return nil, err
 		}
 		userIDs = append(userIDs, id)
+	}
+	if rows.Err() != nil {
+		return nil, err
 	}
 	return userIDs, nil
 }
 
 // IsUser returns true if user is found in the db and false otherwise.
-func (DB *SQLiteRespository) IsUser(id int64) bool {
-	query := `select * from users_tbl where id = ?`
-	row := DB.db.QueryRow(query, id)
+func (DB *Respository) IsUser(id int64) bool {
+	query := `select * from users_tbl where id = $1`
+	row := DB.db.QueryRow(context.Background(), query, id)
 	var x USER
 	if err := row.Scan(&x.ID, &x.Username); err != nil {
 		return false
@@ -83,17 +85,14 @@ func (DB *SQLiteRespository) IsUser(id int64) bool {
 	return true
 }
 
-func (DB *SQLiteRespository) Delete(id int64) error {
-	query := `DELETE FROM users_tbl WHERE id = ?`
-	res, err := DB.db.Exec(query, id)
+func (DB *Respository) Delete(id int64) error {
+	query := `DELETE FROM users_tbl WHERE id = $1`
+	commandTag, err := DB.db.Exec(context.Background(), query, id)
 	if err != nil {
 		return err
 	}
-	if rowsAffected, err := res.RowsAffected(); err != nil {
-		return err
-	} else if rowsAffected == 0 {
+	if commandTag.RowsAffected() != 1 {
 		return ErrDeleteFailed
 	}
-
 	return nil
 }
