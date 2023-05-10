@@ -12,17 +12,11 @@ import (
 
 var FailedRequest string = fmt.Sprintf("<b>%v</b>\n\n<i>%v</i>", "unable to fetch request", "please do try again")
 
-type FuncOrSlice interface {
-	func() []string | []string
-}
-
 func NewBot(token string, timeout int) *tele.Bot {
-
 	pref := tele.Settings{
 		Token:  token,
 		Poller: &tele.LongPoller{Timeout: time.Duration(timeout) * time.Second},
 	}
-
 	b, err := tele.NewBot(pref)
 	if err != nil {
 		log.Fatal(err)
@@ -52,7 +46,7 @@ func checkIfFilePresent(filename string) bool {
 
 }
 
-func resolveAudioMessgae() (*tele.Audio, error) {
+func ResolveAudioMessgae() (*tele.Audio, error) {
 	_, m, d := time.Now().Date()
 	filename := fmt.Sprintf("Bible Reading for %v/%v", m, d)
 
