@@ -68,7 +68,7 @@ func (a Application) GetBibleTextHandlerFunc(c tele.Context) error {
 }
 
 func (a Application) GetAudioMessageHandlerFunc(c tele.Context) error {
-	audioFile, err := resolveAudioMessgae()
+	audioFile, err := ResolveAudioMessgae()
 	if err != nil {
 		return c.Reply(FailedRequest, tele.ModeHTML)
 	}
