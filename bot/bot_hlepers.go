@@ -46,7 +46,8 @@ func checkIfFilePresent(filename string) bool {
 
 }
 
-func ResolveAudioMessgae() (*tele.Audio, error) {
+func ResolveAudioMessge() (*tele.Audio, error) {
+
 	_, m, d := time.Now().Date()
 	filename := fmt.Sprintf("Bible Reading for %v/%v", m, d)
 
@@ -54,7 +55,6 @@ func ResolveAudioMessgae() (*tele.Audio, error) {
 		a := &tele.Audio{File: tele.FromDisk("assets/" + services.AudioFilename), Title: filename, Performer: filename}
 		return a, nil
 	}
-
 	err := services.GetAudioMessage()
 	if err != nil {
 		return nil, err
@@ -64,7 +64,13 @@ func ResolveAudioMessgae() (*tele.Audio, error) {
 
 }
 
-// msg, err := TextResponse(nil, services.GetAudioMessage())
-// if err != nil {
-// 	return msg, nil
-// }
+func ResolveImageMessage() (*tele.Photo, error) {
+
+	err := services.GetRandomsQuoteImage()
+	if err != nil {
+		return nil, err
+	}
+	img := &tele.Photo{File: tele.FromDisk("assets/image.jpeg")}
+	return img, nil
+
+}

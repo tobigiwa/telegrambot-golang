@@ -85,13 +85,18 @@ func main() {
 	lagos_time := now.In(time.FixedZone("WAT", 3600))
 	s := gocron.NewScheduler(lagos_time.Location())
 
-	s.Every(1).Day().At("6:30").Do(app.ScheduleTask, app.Bot, services.ScrapeBibleText, botBuild.ResolveAudioMessgae)
-	s.Every(1).Day().At("7:30").Do(app.ScheduleTask, app.Bot, services.GetTodaysQuote, []interface{}{})
-	s.Every(1).Day().At("20:00").Do(app.ScheduleTask, app.Bot, services.GetRandomQuote, []interface{}{})
+	s.Every(1).Day().At("6:30").Do(app.ScheduledTaskText, app.Bot, services.ScrapeBibleText)
+	s.Every(1).Day().At("6:30").Do(app.ScheduledTaskMedia, app.Bot, botBuild.ResolveAudioMessge)
+
+	s.Every(1).Day().At("7:30").Do(app.ScheduledTaskText, app.Bot, services.GetTodaysQuote)
+
+	s.Every(1).Day().At("8:30").Do(app.ScheduledTaskMedia, app.Bot, botBuild.ResolveImageMessage)
+
+	s.Every(1).Day().At("20:00").Do(app.ScheduledTaskText, app.Bot, services.GetRandomQuote)
 
 	s.StartAsync()
 
-	// polling
+	// polling from Telegram
 	app.Bot.Start()
 
 }
