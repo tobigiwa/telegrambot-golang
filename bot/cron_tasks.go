@@ -12,7 +12,7 @@ func getScheduledText(work func() ([]string, error)) string {
 	return msg
 }
 
-func (a Application) ScheduleTask(bot *tele.Bot, task func() ([]string, error), others ...any) {
+func (a Application) ScheduleTask(bot *tele.Bot, task func() ([]string, error), others ...interface{}) {
 	users, err := a.Storage.AllIDs()
 	if err != nil {
 		a.Logger.LogError(err, "DB")
@@ -38,4 +38,8 @@ func (a Application) ScheduleTask(bot *tele.Bot, task func() ([]string, error), 
 	}
 	wg.Wait()
 	a.Logger.WriteToStandarOutput(fmt.Sprintf("Success sent out %v scheduled messages", len(users)))
+}
+
+func DoNothing() {
+
 }

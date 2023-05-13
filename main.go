@@ -86,8 +86,8 @@ func main() {
 	s := gocron.NewScheduler(lagos_time.Location())
 
 	s.Every(1).Day().At("6:30").Do(app.ScheduleTask, app.Bot, services.ScrapeBibleText, botBuild.ResolveAudioMessgae)
-	s.Every(1).Day().At("7:30").Do(app.ScheduleTask, app.Bot, services.GetTodaysQuote, nil)
-	s.Every(1).Day().At("20:00").Do(app.ScheduleTask, app.Bot, services.GetRandomQuote, nil)
+	s.Every(1).Day().At("7:30").Do(app.ScheduleTask, app.Bot, services.GetTodaysQuote, []interface{}{})
+	s.Every(1).Day().At("20:00").Do(app.ScheduleTask, app.Bot, services.GetRandomQuote, []interface{}{})
 
 	s.StartAsync()
 
