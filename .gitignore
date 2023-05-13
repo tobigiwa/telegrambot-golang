@@ -5,3 +5,4 @@ non.go
 *.log
 assets/
 telegrambot
+*.sh
