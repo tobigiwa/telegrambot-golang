@@ -6,3 +6,4 @@ non.go
 assets/
 telegrambot
 *.sh
+deploy.yml
