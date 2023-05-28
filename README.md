@@ -8,7 +8,7 @@
 - Cron jobs setup ✅
 - Bible verse of the day ✅
 - Audio bible message of the day ✅
-- database ✅
+- Persistent storage ✅
 - Career motivational audio ❎
 - Conversational AI ❎
 - Remainder system ❎

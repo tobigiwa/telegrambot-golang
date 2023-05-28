@@ -24,7 +24,7 @@ func (a Application) CheckMemberShip(next tele.HandlerFunc) tele.HandlerFunc {
 				}
 			}(a)
 
-			c.Send(`***Welcome our dear new Friend***`, tele.ModeMarkdown)
+			c.Send(`***Welcome our dear new Friend, we noticed it your first time here...***`, tele.ModeMarkdown)
 			wg.Wait()
 		}
 		return next(c)
