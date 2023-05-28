@@ -61,7 +61,7 @@ func (a Application) BackToStartHanlerFunc(c tele.Context) error {
 
 func (a Application) GetBibleTextHandlerFunc(c tele.Context) error {
 	msg, err := TextResponse(services.ScrapeBibleText())
-	if err != nil {
+	if err != nil {  
 		a.Logger.LogError(err, "SERVICES")
 	}
 	return c.Reply(msg, tele.ModeHTML)

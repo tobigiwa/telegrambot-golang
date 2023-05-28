@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "chatbot"
+version = "0.1.0"
+description = ""
+authors = ["OLuwatobiTobias <giwaoluwatobi@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+transformers = {extras = ["torch"], version = "^4.29.2"}
+torch = {version = "^2.0.1", python = "^3.11", platform = "linux"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
