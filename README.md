@@ -36,3 +36,9 @@ To run the bot
 - Remainder system ❎
 - Game ❎
 - Settings ❎
+
+##  A view
+![a](./images/b)
+![a](./images/d)
+![a](./images/a)
+
