@@ -2,7 +2,6 @@ package bot
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -11,18 +10,6 @@ import (
 )
 
 var FailedRequest string = fmt.Sprintf("<b>%v</b>\n\n<i>%v</i>", "unable to fetch request", "please do try again")
-
-func NewBot(token string, timeout int) *tele.Bot {
-	pref := tele.Settings{
-		Token:  token,
-		Poller: &tele.LongPoller{Timeout: time.Duration(timeout) * time.Second},
-	}
-	b, err := tele.NewBot(pref)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return b
-}
 
 func TextResponse(v []string, err error) (string, error) {
 	if err != nil {

@@ -19,7 +19,7 @@ import (
 )
 
 func main() {
-	// DATABSE
+	// DATABASE
 	conn, err := pgxpool.New(context.Background(), getDatabaseURL())
 	if err != nil {
 		log.Fatal(err)
@@ -38,8 +38,15 @@ func main() {
 	}
 
 	// BOT
-	bot := botBuild.NewBot(getBotToken(), 10)
+	pref := tele.Settings{
+		Token: getBotToken(),
+	}
+	bot, err := tele.NewBot(pref)
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	// APP
 	app := botBuild.Application{
 		Bot:     bot,
 		Storage: db,
@@ -82,21 +89,36 @@ func main() {
 
 	// cron jobs
 	now := time.Now().UTC()
-	lagos_time := now.In(time.FixedZone("WAT", 3600))
-	s := gocron.NewScheduler(lagos_time.Location())
+	lagosTime := now.In(time.FixedZone("WAT", 3600))
+	s := gocron.NewScheduler(lagosTime.Location())
 
 	s.Every(1).Day().At("6:30").Do(app.ScheduledTaskText, app.Bot, services.ScrapeBibleText)
 	s.Every(1).Day().At("6:31").Do(app.ScheduledTaskMedia, app.Bot, botBuild.ResolveAudioMessge)
-
 	s.Every(1).Day().At("7:30").Do(app.ScheduledTaskText, app.Bot, services.GetTodaysQuote)
-
 	s.Every(1).Day().At("8:30").Do(app.ScheduledTaskMedia, app.Bot, botBuild.ResolveImageMessage)
-
 	s.Every(1).Day().At("20:00").Do(app.ScheduledTaskText, app.Bot, services.GetRandomQuote)
 
 	s.StartAsync()
 
-	// polling from Telegram
+	// // Create a new Webhook object.
+	// wh := &tele.Webhook{
+	// 	Listen: ":8081",
+	// 	Endpoint: &tele.WebhookEndpoint{
+	// 		PublicURL: "https://271a-102-89-22-111.ngrok-free.app",
+	// 	},
+	// }
+
+	// // Set the webhook.
+	// err = app.Bot.SetWebhook(wh)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// if err := http.ListenAndServe(":8081", nil); err != nil {
+	// 	fmt.Println("at server")
+	// 	log.Fatal(err)
+	// }
+
 	app.Bot.Start()
 
 }
